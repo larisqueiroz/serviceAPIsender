@@ -8,14 +8,20 @@ using RabbitMQ.Client.Exceptions;
 using ServiceAPISender.Models;
 
 Dictionary<string, double> Products = new Dictionary<string, double>();
-Products.Add("Lápis", 2.00);
-Products.Add("Feijão", 7.72);
-Products.Add("Caderno", 35.00);
-Products.Add("Água", 5.00);
-Products.Add("Cacau em Pó", 32.00);
-Products.Add("Amaciante", 25.00);
-Products.Add("Azeite", 42.00);
-Products.Add("Chinelo", 40.00);
+Products.Add("0", 2.00);
+Products.Add("1", 7.72);
+Products.Add("2", 35.00);
+Products.Add("3", 5.00);
+Products.Add("4", 32.00);
+Products.Add("5", 25.00);
+Products.Add("6", 42.00);
+Products.Add("7", 40.00);
+
+List<string> ProductNames = new List<string>()
+{
+    "Lápis", "Feijão", "Caderno", "Água", "Cacau em Pó", "Amaciante",
+    "Azeite", "Chinelo"
+};
 
 IConnection? connection = null;
 IModel channel = null;
@@ -49,22 +55,32 @@ while (true)
 
 channel.QueueDeclare(queue: "serviceAPI", durable: default, exclusive: false, autoDelete: false, arguments: null);
 
-// TODO: LÓGICA DE MONTAGEM DE PACOTE
-//while (true)
-//{
+while (true)
+{
+    Random random = new Random();
+
+    int qty = random.Next(1, 7);
+    List<ItemDto> itens = new List<ItemDto>();
+
+    for (int i = 0; i < qty; i++)
+    {
+        var name = ProductNames[random.Next(0, 7)];
+        var index = ProductNames.IndexOf(name).ToString();
+        var item = new ItemDto()
+        {
+            Produto = name,
+            Quantidade = random.Next(1, 10),
+            Preco = Products[index]
+        };
+        var added = itens.Select(i => i.Produto);
+        if (!added.Contains(item.Produto))
+            itens.Add(item);
+    }
     var message = new Message()
     {
-        CodigoCliente = 1,
-        CodigoPedido = 1,
-        Itens = new List<ItemDto>()
-        {
-            new ItemDto()
-            {
-                Preco = 2,
-                Produto = "lapis",
-                Quantidade = 5
-            }
-        }
+        CodigoCliente = random.Next(1,100),
+        CodigoPedido = random.Next(1, 99000),
+        Itens = itens
     };
 
     var messageToSend = JsonSerializer.Serialize(message);
@@ -74,5 +90,7 @@ channel.QueueDeclare(queue: "serviceAPI", durable: default, exclusive: false, au
     channel.BasicPublish(exchange: string.Empty, routingKey:"serviceAPI", basicProperties:null, body: body);
     
     Console.WriteLine("[NOVOENVIO] " + messageToSend);
-//}
+
+    Thread.Sleep(120000);
+}
 
