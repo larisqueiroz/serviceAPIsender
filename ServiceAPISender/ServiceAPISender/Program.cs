@@ -7,12 +7,22 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using ServiceAPISender.Models;
 
+Dictionary<string, double> Products = new Dictionary<string, double>();
+Products.Add("Lápis", 2.00);
+Products.Add("Feijão", 7.72);
+Products.Add("Caderno", 35.00);
+Products.Add("Água", 5.00);
+Products.Add("Cacau em Pó", 32.00);
+Products.Add("Amaciante", 25.00);
+Products.Add("Azeite", 42.00);
+Products.Add("Chinelo", 40.00);
+
 IConnection? connection = null;
 IModel channel = null;
 
 var factory = new ConnectionFactory
 {
-    HostName = "localhost",
+    HostName = "rabbitmq",
     Port = 5672,
     UserName = "guest",
     Password = "guest",
@@ -40,8 +50,8 @@ while (true)
 channel.QueueDeclare(queue: "serviceAPI", durable: default, exclusive: false, autoDelete: false, arguments: null);
 
 // TODO: LÓGICA DE MONTAGEM DE PACOTE
-while (true)
-{
+//while (true)
+//{
     var message = new Message()
     {
         CodigoCliente = 1,
@@ -64,5 +74,5 @@ while (true)
     channel.BasicPublish(exchange: string.Empty, routingKey:"serviceAPI", basicProperties:null, body: body);
     
     Console.WriteLine("[NOVOENVIO] " + messageToSend);
-}
+//}
 
