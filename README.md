@@ -13,6 +13,27 @@ Along with the service at https://github.com/larisqueiroz/serviceAPI, this is an
 ## Features
 * Sends orders messages to the consumer at https://github.com/larisqueiroz/serviceAPI.
 
+* Message format:
+```
+{
+       "codigoPedido": 1001,
+       "codigoCliente":1,
+       "itens": [
+           {
+               "produto": "lápis",
+               "quantidade": 100,
+               "preco": 1.10
+           },
+           {
+               "produto": "caderno",
+               "quantidade": 10,
+               "preco": 1.00
+           }
+       ]
+   }
+```
+
+
 ## Getting Started
 
 1. Execute the command bellow:
